@@ -72,7 +72,7 @@ s32 NWC24MakeUserID(u64* nwc24_id, u32 hollywood_id, u16 id_ctr, u8 hardware_mod
     u64 mix_id = ((u64)area_code << 50) | ((u64)hardware_model << 47) | ((u64)hollywood_id << 15) |
                     ((u64)id_ctr << 10);
 
-    printf("make: %llu\n", mix_id);
+    printf("7. make: %llu\n", mix_id);
 
     u64 mix_id_copy1 = mix_id;
 
@@ -175,10 +175,6 @@ u64 getUnScrambleId(u64 nwc24_id)
     }
 
     printf("5. unscramble: %llu\n", mix_id);
-
-    u64 temp = mix_id & 0x7FFFFFFFF;
-	  mix_id = (temp << 10) | ((mix_id >> 43) & 0x3FF);
-  	mix_id ^= 0xB3B3B3B3B3B3;
 
     for (ctr = 0; ctr <= 42; ctr++)
     {
