@@ -3,60 +3,6 @@
 #include <map>
 #include <string>
 
-/*      if (!area.empty() && !model.empty())
-      {
-        u8 area_code = GetAreaCode(area);
-        u8 id_ctr = config.IdGen();
-        u8 hardware_model = GetHardwareModel(model);
-
-        u32 HollywoodID = m_ios.GetIOSC().GetDeviceId();
-        u64 UserID = 0;
-
-        s32 ret = NWC24MakeUserID(&UserID, HollywoodID, id_ctr, hardware_model, area_code);
-        config.SetId(UserID);
-        config.IncrementIdGen();
-        config.SetCreationStage(NWC24::NWC24Config::NWC24_IDCS_GENERATED);
-        config.WriteConfig();
-
-        WriteReturnValue(ret, request.buffer_out);
-      }
-      else
-      {
-        WriteReturnValue(NWC24::WC24_ERR_FATAL, request.buffer_out);
-      }
-    }
-    else if (config.CreationStage() == NWC24::NWC24Config::NWC24_IDCS_GENERATED)
-    {
-      WriteReturnValue(NWC24::WC24_ERR_ID_GENERATED, request.buffer_out);
-    }
-    else if (config.CreationStage() == NWC24::NWC24Config::NWC24_IDCS_REGISTERED)
-    {
-      WriteReturnValue(NWC24::WC24_ERR_ID_REGISTERED, request.buffer_out);
-    }
-    Memory::Write_U64(config.Id(), request.buffer_out + 4);
-    Memory::Write_U32(config.CreationStage(), request.buffer_out + 0xC);
-    break;
-
-  case IOCTL_NWC24_GET_SCHEDULAR_STAT:
-    INFO_LOG(IOS_WC24, "NET_KD_REQ: IOCTL_NWC24_GET_SCHEDULAR_STAT - NI");
-    break;
-
-  case IOCTL_NWC24_SAVE_MAIL_NOW:
-    INFO_LOG(IOS_WC24, "NET_KD_REQ: IOCTL_NWC24_SAVE_MAIL_NOW - NI");
-    break;
-
-  case IOCTL_NWC24_REQUEST_SHUTDOWN:
-    // if ya set the IOS version to a very high value this happens ...
-    INFO_LOG(IOS_WC24, "NET_KD_REQ: IOCTL_NWC24_REQUEST_SHUTDOWN - NI");
-    break;
-
-  default:
-    request.Log(GetDeviceName(), Common::Log::IOS_WC24);
-  }
-
-  return GetDefaultReply(return_value);
-} */
-
 u8 GetAreaCode(const std::string& area)
 {
   static const std::map<std::string, u8> regions = {
@@ -231,8 +177,8 @@ u64 getUnScrambleId(u64 nwc24_id)
     printf("5. unscramble: %llu\n", mix_id);
 
     u64 temp = mix_id & 0x7FFFFFFFF;
-	mix_id = (temp << 10) | ((mix_id >> 43) & 0x3FF);
-	mix_id ^= 0xB3B3B3B3B3B3;
+	  mix_id = (temp << 10) | ((mix_id >> 43) & 0x3FF);
+  	mix_id ^= 0xB3B3B3B3B3B3;
 
     for (ctr = 0; ctr <= 42; ctr++)
     {
