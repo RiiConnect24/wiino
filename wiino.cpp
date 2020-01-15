@@ -182,9 +182,9 @@ u64 getUnScrambleId(u64 nwc24_id)
     u64 mix_id_copy5 = mix_id * 0x400 | mix_id_copy3 >> 0xb & 0x3FF;
     u64 mix_id_copy6 = (mix_id_copy4 << 32) | mix_id_copy5;
     u64 mix_id_copy7 = mix_id_copy6 ^ 0x0000B3B3B3B3B3B3ULL;
-    mix_id = mix_id_copy7 & 0x3FF;
+    u16 unused = mix_id_copy7 & 0x3FF;
 
-    printf("6. unscramble: %llu\n", mix_id);
+    printf("6. unscramble: %llu\n", mix_id_copy7);
 
     return mix_id;
 }
