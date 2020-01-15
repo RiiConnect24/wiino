@@ -58,7 +58,8 @@ static u64 u64_insert_byte2(u64 value, u8 newval, u8 byte)
 const u8 table2[8] = {0x1, 0x5, 0x0, 0x4, 0x2, 0x3, 0x6, 0x7};
 const u8 table1[16] = {0x4, 0xB, 0x7, 0x9, 0xF, 0x1, 0xD, 0x3,
                        0xC, 0x2, 0x6, 0xE, 0x8, 0x0, 0xA, 0x5};
-const u8 table1_inv[16] = {0xD, 0x5, 0x9, 0x7, 0x0, 0xE, 0xA, 0x2,
+const u8 table1_inv[16] = {0xD, 0x5, 0x9, 0x7, 0x0, 0xF, // 0xE?
+                       0xA, 0x2,
                        0xC, 0x3, 0xE, 0x1, 0x8, 0x6, 0xB, 0x4};
 
 s32 NWC24MakeUserID(u64* nwc24_id, u32 hollywood_id, u16 id_ctr, u8 hardware_model,
@@ -73,8 +74,6 @@ s32 NWC24MakeUserID(u64* nwc24_id, u32 hollywood_id, u16 id_ctr, u8 hardware_mod
                     ((u64)id_ctr << 10);
 
     printf("7. make: %llu\n", mix_id);
-
-    u64 mix_id_copy1 = mix_id;
 
     int ctr = 0;
     for (ctr = 0; ctr <= 42; ctr++)
@@ -91,8 +90,10 @@ s32 NWC24MakeUserID(u64* nwc24_id, u32 hollywood_id, u16 id_ctr, u8 hardware_mod
 
     printf("6. make: %llu\n", mix_id);
 
+    u64 mix_id_copy1 = mix_id;
+
     mix_id = (mix_id_copy1 | (mix_id & 0xFFFFFFFFUL)) ^ 0x0000B3B3B3B3B3B3ULL;
-    mix_id = (mix_id >> 10) | ((mix_id & 0x3FF) << (43));
+    mix_id = (mix_id >> 10) | ((mix_id & 0x3FF) << (11 + 32));
 
     printf("5. make: %llu\n", mix_id);
 
@@ -176,19 +177,16 @@ u64 getUnScrambleId(u64 nwc24_id)
 
     printf("5. unscramble: %llu\n", mix_id);
 
-    for (ctr = 0; ctr <= 42; ctr++)
-    {
-        u64 value = mix_id >> (52 - ctr);
-        if (value & 1)
-        {
-            value = 0x0000000000000635ULL << (42 - ctr);
-            mix_id ^= value;
-        }
-        printf("%u ", mix_id);
-    }
-    printf("\n");
+    u64 mix_id_copy3 = mix_id >> 0x20;
+    u64 mix_id_copy4 = mix_id >> 0x16 | (mix_id_copy3 & 0x7FF) << 10;
+    u64 mix_id_copy5 = mix_id * 0x400 | mix_id_copy3 >> 0xb & 0x3FF;
+    u64 mix_id_copy6 = (mix_id_copy4 << 32) | mix_id_copy5;
+    u64 mix_id_copy7 = mix_id_copy6 ^ 0x0000B3B3B3B3B3B3ULL;
 
-    printf("6. unscramble: %llu\n", mix_id);
+    printf("6. unscramble: %llu\n", mix_id_copy4);
+    printf("6. unscramble: %llu\n", mix_id_copy5);
+    printf("6. unscramble: %llu\n", mix_id_copy6);
+    printf("6. unscramble: %llu\n", mix_id_copy7);
 
     return mix_id;
 }
