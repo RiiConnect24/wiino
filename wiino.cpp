@@ -182,10 +182,9 @@ u64 getUnScrambleId(u64 nwc24_id)
     u64 mix_id_copy5 = mix_id * 0x400 | mix_id_copy3 >> 0xb & 0x3FF;
     u64 mix_id_copy6 = (mix_id_copy4 << 32) | mix_id_copy5;
     u64 mix_id_copy7 = mix_id_copy6 ^ 0x0000B3B3B3B3B3B3ULL;
-    u16 id_ctr = (unsigned int)mix_id_copy7;
     u16 unused = mix_id_copy7 & 0x3FF;
 
-    printf("6. unscramble: %llu\n", id_ctr);
+    printf("6. unscramble: %llu\n", mix_id_copy7);
 
     return mix_id;
 }
@@ -197,12 +196,10 @@ u64 decodeWiiId(u64 nwc24_id, u32 *hollywood_id, u16 *id_ctr, u8 *hardware_model
     *area_code = (nwc24_id2 >> 50) & 7;
     *hollywood_id = (nwc24_id2 >> 15) & 0xFFFFFFFF;
     *id_ctr = (nwc24_id2 >> 10) & 0x1F;
-    *unused = nwc24_id2 = 0x3FF;
     printf("hardware_model: %u\n", hardware_model);
     printf("area_code: %u\n", area_code);
     printf("hollywood_id: %u\n", hollywood_id);
     printf("id_ctr: %u\n", id_ctr);
-    printf("unused: %u\n", unused);
     return nwc24_id;
 }
 
