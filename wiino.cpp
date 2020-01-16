@@ -196,10 +196,10 @@ u64 decodeWiiId(u64 nwc24_id, u32 *hollywood_id, u16 *id_ctr, u8 *hardware_model
     *area_code = (nwc24_id2 >> 50) & 7;
     *hollywood_id = (nwc24_id2 >> 15) & 0xFFFFFFFF;
     *id_ctr = (nwc24_id2 >> 10) & 0x1F;
-    printf("hardware_model: %u\n", hardware_model);
-    printf("area_code: %u\n", area_code);
-    printf("hollywood_id: %u\n", hollywood_id);
-    printf("id_ctr: %u\n", id_ctr);
+    printf("hardware_model: %u\n", *hardware_model);
+    printf("area_code: %u\n", *area_code);
+    printf("hollywood_id: %u\n", *hollywood_id);
+    printf("id_ctr: %u\n", *id_ctr);
     return nwc24_id;
 }
 
