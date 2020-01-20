@@ -222,7 +222,7 @@ u16 unused;
 void NWC24CheckUserID(u64 nwc24_id)
 {
     u64 nwc24_id3 = decodeWiiID(nwc24_id, &hollywood_id, &id_ctr, &hardware_model, &area_code, &unused);
-    printf("%llu", checkCRC(nwc24_id3));
+    printf("%d", (u8)checkCRC(nwc24_id3));
 }
 
 void NWC24GetHollywoodID(u64 nwc24_id)
@@ -283,33 +283,28 @@ s32 main(int argc, char *argv[])
         char *stopstring;
         u64 nwc24_id5 = strtoull(argv[2], &stopstring, 10);
 
-        if (strcmp(argv[1], "check"))
+        if (strcmp(argv[1], "check") == 0)
         {
-            printf("%s", argv[1]);
             NWC24CheckUserID(nwc24_id5);
         }
 
-        else if (strcmp(argv[1], "hollywood"))
+        else if (strcmp(argv[1], "hollywood") == 0)
         {
-            printf("%s", argv[1]);
             NWC24GetHollywoodID(nwc24_id5);
         }
 
-        else if (strcmp(argv[1], "counter"))
+        else if (strcmp(argv[1], "counter") == 0)
         {
-            printf("%s", argv[1]);
             NWC24GetIDCounter(nwc24_id5);
         }
 
-        else if (strcmp(argv[1], "hardwaremodel"))
+        else if (strcmp(argv[1], "hardwaremodel") == 0)
         {
-            printf("%s", argv[1]);
             NWC24GetHardwareModel(nwc24_id5);
         }
         
-        else if (strcmp(argv[1], "areacode"))
+        else if (strcmp(argv[1], "areacode") == 0)
         {
-            printf("%s", argv[1]);
             NWC24GetAreaCode(nwc24_id5);
         }
 
@@ -321,7 +316,7 @@ s32 main(int argc, char *argv[])
 
     else if (argc == 6)
     {
-        if (strcmp(argv[1], "make"))
+        if (strcmp(argv[1], "make") == 0)
         {
             char *stopstring;
             NWC24MakeUserID(strtoul(argv[2], &stopstring, 10), 
