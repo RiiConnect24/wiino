@@ -62,20 +62,8 @@ const u8 table1_inv[16] = {0xD, 0x5, 0x9, 0x7, 0x0, 0xF, // 0xE?
                        0xA, 0x2,
                        0xC, 0x3, 0xE, 0x1, 0x8, 0x6, 0xB, 0x4};
 
-s32 NWC24MakeUserID(u64* nwc24_id, u32 hollywood_id, u16 id_ctr, u8 hardware_model,
-                                  u8 area_code)
+u64 checkCRC(u64 mix_id)
 {
-    printf("hardware_model: %u\n", hardware_model);
-    printf("area_code: %u\n", area_code);
-    printf("hollywood_id: %u\n", hollywood_id);
-    printf("id_ctr: %u\n", id_ctr);
-
-    u64 mix_id = ((u64)area_code << 50) | ((u64)hardware_model << 47) | ((u64)hollywood_id << 15) |
-                    ((u64)id_ctr << 10);
-    u64 mix_id_copy1 = mix_id;
-
-    printf("7. make: %llu\n", mix_id);
-
     int ctr = 0;
     for (ctr = 0; ctr <= 42; ctr++)
     {
@@ -85,17 +73,36 @@ s32 NWC24MakeUserID(u64* nwc24_id, u32 hollywood_id, u16 id_ctr, u8 hardware_mod
             value = 0x0000000000000635ULL << (42 - ctr);
             mix_id ^= value;
         }
-        printf("%u ", mix_id);
+        // printf("%u ", mix_id);
     }
-    printf("\n");
+    // printf("\n");
+    return mix_id;
+}
 
-    printf("6. make: %llu\n", mix_id);
+s32 NWC24MakeUserID(u64* nwc24_id, u32 hollywood_id, u16 id_ctr, u8 hardware_model,
+                                  u8 area_code)
+{
+    // printf("hardware_model: %u\n", hardware_model);
+    // printf("area_code: %u\n", area_code);
+    // printf("hollywood_id: %u\n", hollywood_id);
+    // printf("id_ctr: %u\n", id_ctr);
+
+    u64 mix_id = ((u64)area_code << 50) | ((u64)hardware_model << 47) | ((u64)hollywood_id << 15) |
+                    ((u64)id_ctr << 10);
+    u64 mix_id_copy1 = mix_id;
+
+    // printf("7. make: %llu\n", mix_id);
+
+    mix_id = checkCRC(mix_id);
+
+    // printf("6. make: %llu\n", mix_id);
 
     mix_id = (mix_id_copy1 | (mix_id & 0xFFFFFFFFUL)) ^ 0x0000B3B3B3B3B3B3ULL;
     mix_id = (mix_id >> 10) | ((mix_id & 0x3FF) << (11 + 32));
 
-    printf("5. make: %llu\n", mix_id);
+    // printf("5. make: %llu\n", mix_id);
 
+    int ctr = 0;
     for (ctr = 0; ctr <= 5; ctr++)
     {
         u8 ret = u64_get_byte(mix_id, ctr);
@@ -104,7 +111,7 @@ s32 NWC24MakeUserID(u64* nwc24_id, u32 hollywood_id, u16 id_ctr, u8 hardware_mod
     }
     u64 mix_id_copy2 = mix_id;
 
-    printf("4. make: %llu\n", mix_id);
+    // printf("4. make: %llu\n", mix_id);
 
     for (ctr = 0; ctr <= 5; ctr++)
     {
@@ -112,17 +119,17 @@ s32 NWC24MakeUserID(u64* nwc24_id, u32 hollywood_id, u16 id_ctr, u8 hardware_mod
         mix_id = u64_insert_byte(mix_id, table2[ctr], ret);
     }
 
-    printf("3. make: %llu\n", mix_id);
+    // printf("3. make: %llu\n", mix_id);
 
     mix_id &= 0x001FFFFFFFFFFFFFULL;
     mix_id = (mix_id << 1) | ((mix_id >> 52) & 1);
 
-    printf("2. make: %llu\n", mix_id);
+    // printf("2. make: %llu\n", mix_id);
 
     mix_id ^= 0x00005E5E5E5E5E5EULL;
     mix_id &= 0x001FFFFFFFFFFFFFULL;
 
-    printf("1. make: %llu\n", mix_id);
+    // printf("1. make: %llu\n", mix_id);
 
     *nwc24_id = mix_id;
 
@@ -138,13 +145,13 @@ u64 getUnScrambleId(u64 nwc24_id)
     u8 a;
     u8 b;
 
-    printf("1. unscramble: %llu\n", mix_id);
+    // printf("1. unscramble: %llu\n", mix_id);
 
     mix_id &= 0x001FFFFFFFFFFFFFULL;
     mix_id ^= 0x00005E5E5E5E5E5EULL;
     mix_id &= 0x001FFFFFFFFFFFFFULL;
 
-    printf("2. unscramble: %llu\n", mix_id);
+    // printf("2. unscramble: %llu\n", mix_id);
 
     u64 mix_id_copy2 = mix_id;
 
@@ -154,7 +161,7 @@ u64 getUnScrambleId(u64 nwc24_id)
     mix_id |= mix_id_copy2 << 48;
     mix_id >>= 1;
 
-    printf("3. unscramble: %llu\n", mix_id);
+    // printf("3. unscramble: %llu\n", mix_id);
 
     mix_id_copy2 = mix_id;
 
@@ -165,7 +172,7 @@ u64 getUnScrambleId(u64 nwc24_id)
         mix_id = u64_insert_byte(mix_id, ctr, ret);
     }
 
-    printf("4. unscramble: %llu\n", mix_id);
+    // printf("4. unscramble: %llu\n", mix_id);
 
     for (ctr = 0; ctr <= 5; ctr++)
     {
@@ -174,53 +181,93 @@ u64 getUnScrambleId(u64 nwc24_id)
         mix_id = u64_insert_byte(mix_id, ctr, foobar & 0xff);
     }
 
-    printf("5. unscramble: %llu\n", mix_id);
+    // printf("5. unscramble: %llu\n", mix_id);
 
     u64 mix_id_copy3 = mix_id >> 0x20;
     u64 mix_id_copy4 = mix_id >> 0x16 | (mix_id_copy3 & 0x7FF) << 10;
-    u64 mix_id_copy5 = mix_id * 0x400 | mix_id_copy3 >> 0xb & 0x3FF;
+    u64 mix_id_copy5 = mix_id * 0x400 | (mix_id_copy3 >> 0xb & 0x3FF);
     u64 mix_id_copy6 = (mix_id_copy4 << 32) | mix_id_copy5;
     u64 mix_id_copy7 = mix_id_copy6 ^ 0x0000B3B3B3B3B3B3ULL;
-    u16 unused = mix_id_copy7 & 0x3FF;
     mix_id = mix_id_copy7;
 
-    printf("6. unscramble: %llu\n", mix_id);
+    // printf("6. unscramble: %llu\n", mix_id);
 
     return mix_id;
 }
 
-u64 decodeWiiId(u64 nwc24_id, u32 *hollywood_id, u16 *id_ctr, u8 *hardware_model, u8 *area_code, u16 *unused)
+u64 decodeWiiID(u64 nwc24_id, u32 *hollywood_id, u16 *id_ctr, u8 *hardware_model, u8 *area_code, u16 *unused)
 {
     u64 nwc24_id2 = getUnScrambleId(nwc24_id);
     *hardware_model = (nwc24_id2 >> 47) & 7;
     *area_code = (nwc24_id2 >> 50) & 7;
     *hollywood_id = (nwc24_id2 >> 15) & 0xFFFFFFFF;
     *id_ctr = (nwc24_id2 >> 10) & 0x1F;
-    printf("hardware_model: %u\n", *hardware_model);
-    printf("area_code: %u\n", *area_code);
-    printf("hollywood_id: %u\n", *hollywood_id);
-    printf("id_ctr: %u\n", *id_ctr);
-    return nwc24_id;
+    *unused = nwc24_id2 & 0x3FF;
+    // printf("hardware_model: %u\n", *hardware_model);
+    // printf("area_code: %u\n", *area_code);
+    // printf("hollywood_id: %u\n", *hollywood_id);
+    // printf("id_ctr: %u\n", *id_ctr);
+    // printf("unused: %u\n", *unused);
+    return nwc24_id2;
 }
 
-s32 CheckUserIdInternal(u64 check_id)
+u32 hollywood_id;
+u16 id_ctr;
+u8 hardware_model;
+u8 area_code;
+u16 unused;
+
+void NWC24CheckUserID(u64 nwc24_id)
 {
-    u8 cRegion, cModel;
-    u16 cUnused, cCounter;
-    u32 cHollywoodId;
-    u64 crc2 = decodeWiiId(check_id, &cHollywoodId, &cCounter, &cModel, &cRegion, &cUnused);
-    return 0;
+    u64 nwc24_id3 = decodeWiiID(nwc24_id, &hollywood_id, &id_ctr, &hardware_model, &area_code, &unused);
+    printf("%u", checkCRC(nwc24_id3) == 0);
 }
 
-s32 NWC24CheckUserId(u64 nwc24_id)
+void NWC24GetHollywoodID(u64 nwc24_id)
 {
-    CheckUserIdInternal(nwc24_id);
+    u64 nwc24_id3 = decodeWiiID(nwc24_id, &hollywood_id, &id_ctr, &hardware_model, &area_code, &unused);
+    printf("%u", hollywood_id);
 }
 
-s32 main()
+void NWC24GetIDCounter(u64 nwc24_id)
 {
-    u64 nwc24_id;
-    NWC24MakeUserID(&nwc24_id, 666, 1, GetHardwareModel("RVL"), GetAreaCode("USA"));
-    printf("user id generated: %llu\n", nwc24_id);
-    NWC24CheckUserId(nwc24_id);
+    u64 nwc24_id3 = decodeWiiID(nwc24_id, &hollywood_id, &id_ctr, &hardware_model, &area_code, &unused);
+    printf("%u", id_ctr);
+}
+
+void NWC24GetHardwareModel(u64 nwc24_id)
+{
+    static const std::map<u8, std::string> models = {
+        {1, "RVL"},
+        {0, "RVT"},
+        {0, "RVV"},
+        {2, "RVD"},
+    };
+    
+    u64 nwc24_id3 = decodeWiiID(nwc24_id, &hollywood_id, &id_ctr, &hardware_model, &area_code, &unused);
+
+    auto entryPos = models.find(hardware_model);
+    if (entryPos != models.end())
+        printf("%s", entryPos->second.c_str());
+}
+
+void NWC24GetAreaCode(u64 nwc24_id)
+{
+    static const std::map<u8, std::string> regions = {
+        {0, "JPN"}, {1, "USA"}, {2, "EUR"},
+        {3, "TWN"}, {4, "KOR"}, {5, "HKG"},
+        {6, "CHN"}, {7, "UNK"},
+    };
+    
+    u64 nwc24_id3 = decodeWiiID(nwc24_id, &hollywood_id, &id_ctr, &hardware_model, &area_code, &unused);
+
+    auto entryPos = regions.find(area_code);
+    if (entryPos != regions.end())
+        printf("%s", entryPos->second.c_str());
+}
+
+s32 main(int argc, char *argv[])
+{
+    // NWC24MakeUserID(&nwc24_id, 666, 1, GetHardwareModel("RVL"), GetAreaCode("USA"));
+    NWC24CheckUserID(6330930957365087);
 }
