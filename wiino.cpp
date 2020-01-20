@@ -81,8 +81,7 @@ u64 checkCRC(u64 mix_id)
     return mix_id;
 }
 
-s32 NWC24MakeUserID(u64* nwc24_id, u32 hollywood_id, u16 id_ctr, u8 hardware_model,
-                                  u8 area_code)
+u64 NWC24iMakeUserID(u32 hollywood_id, u16 id_ctr, u8 hardware_model, u8 area_code)
 {
     // printf("hardware_model: %u\n", hardware_model);
     // printf("area_code: %u\n", area_code);
@@ -133,12 +132,7 @@ s32 NWC24MakeUserID(u64* nwc24_id, u32 hollywood_id, u16 id_ctr, u8 hardware_mod
 
     // printf("1. make: %llu\n", mix_id);
 
-    *nwc24_id = mix_id;
-
-    if (mix_id > 9999999999999999ULL)
-        return 1;
-
-    return 0;
+    return mix_id;
 }
 
 u64 getUnScrambleId(u64 nwc24_id)
@@ -213,11 +207,10 @@ u64 decodeWiiID(u64 nwc24_id, u32 *hollywood_id, u16 *id_ctr, u8 *hardware_model
     return nwc24_id2;
 }
 
-int NWC24MakeUserID(u32 hollywood_id, u16 id_ctr, u8 hardware_model, u8 area_code)
+void NWC24MakeUserID(u32 hollywood_id, u16 id_ctr, u8 hardware_model, u8 area_code)
 {
-    u64 *nwc24_id4;
-    NWC24MakeUserID(*nwc24_id4, hollywood_id, id_ctr, hardware_model, area_code);
-    printf("%u", (int)nwc24_id4);
+    u64 nwc24_id4 = NWC24iMakeUserID(hollywood_id, id_ctr, hardware_model, area_code);
+    printf("%llu", nwc24_id4);
 }
 
 u32 hollywood_id;
@@ -229,7 +222,7 @@ u16 unused;
 void NWC24CheckUserID(u64 nwc24_id)
 {
     u64 nwc24_id3 = decodeWiiID(nwc24_id, &hollywood_id, &id_ctr, &hardware_model, &area_code, &unused);
-    printf("%u", (int)checkCRC(nwc24_id3));
+    printf("%llu", checkCRC(nwc24_id3));
 }
 
 void NWC24GetHollywoodID(u64 nwc24_id)
@@ -278,46 +271,63 @@ void NWC24GetAreaCode(u64 nwc24_id)
 void DisplayUsage()
 {
     printf("%s", "usage:\n\n");
-    printf("%s", "wiino check <wii number> - checks if wii number is valid, returns 0 if yes");
-    printf("%s", "wiino <hollywood|counter|hardwaremodel|areacode> - gets specified value from wii number");
+    printf("%s", "wiino check <wii number> - checks if wii number is valid, returns 0 if yes\n");
+    printf("%s", "wiino <hollywood|counter|hardwaremodel|areacode> - gets specified value from wii number\n");
     printf("%s", "wiino make <hollywood> <counter> <hardwaremodel> <areacode> - makes wii number from specified values");
 }
 
 s32 main(int argc, char *argv[])
 {
-    // NWC24MakeUserID(&nwc24_id, 666, 1, GetHardwareModel("RVL"), GetAreaCode("USA"));
-    if (argc == 2)
+    if (argc == 3)
     {
-        switch(argv[1])
+        char *stopstring;
+        u64 nwc24_id5 = strtoull(argv[2], &stopstring, 10);
+
+        if (strcmp(argv[1], "check"))
         {
-            char *stopstring;
-            u64 nwc24_id5 = strtoull(argv[2], &stopstring, 2);
-            case "check":
-                NWC24CheckUserID(nwc24_id5);
-                break;
-            case "hollywood":
-                NWC24GetHollywoodID(nwc24_id5);
-                break;
-            case "counter":
-                NWC24GetIDCounter(nwc24_id5);
-                break;
-            case "hardwaremodel":
-                NWC24GetHardwareModel(nwc24_id5);
-                break;
-            case "areacode":
-                NWC24GetAreaCode(nwc24_id5);
-                break;
-            default:
-                DisplayUsage();
-                break;
+            printf("%s", argv[1]);
+            NWC24CheckUserID(nwc24_id5);
+        }
+
+        else if (strcmp(argv[1], "hollywood"))
+        {
+            printf("%s", argv[1]);
+            NWC24GetHollywoodID(nwc24_id5);
+        }
+
+        else if (strcmp(argv[1], "counter"))
+        {
+            printf("%s", argv[1]);
+            NWC24GetIDCounter(nwc24_id5);
+        }
+
+        else if (strcmp(argv[1], "hardwaremodel"))
+        {
+            printf("%s", argv[1]);
+            NWC24GetHardwareModel(nwc24_id5);
+        }
+        
+        else if (strcmp(argv[1], "areacode"))
+        {
+            printf("%s", argv[1]);
+            NWC24GetAreaCode(nwc24_id5);
+        }
+
+        else
+        {
+            DisplayUsage();
         }
     }
 
     else if (argc == 6)
     {
-        if (argv[1] == "make")
+        if (strcmp(argv[1], "make"))
         {
-            NWC24MakeUserID(argv[2], argv[3], argv[4], argv[5]);
+            char *stopstring;
+            NWC24MakeUserID(strtoul(argv[2], &stopstring, 10), 
+                                (u16)strtoul(argv[3], &stopstring, 10),
+                                (u8)strtoul(argv[4], &stopstring, 10),
+                                (u8)strtoul(argv[5], &stopstring, 10));
         }
 
         else
