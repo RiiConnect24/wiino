@@ -291,20 +291,21 @@ s32 main(int argc, char *argv[])
         switch(argv[1])
         {
             char *stopstring;
+            u64 nwc24_id5 = strtoull(argv[2], &stopstring, 2);
             case "check":
-                NWC24CheckUserID(argv[2]);
+                NWC24CheckUserID(nwc24_id5);
                 break;
             case "hollywood":
-                NWC24GetHollywoodID(argv[2]);
+                NWC24GetHollywoodID(nwc24_id5);
                 break;
             case "counter":
-                NWC24GetIDCounter(argv[2]);
+                NWC24GetIDCounter(nwc24_id5);
                 break;
             case "hardwaremodel":
-                NWC24GetHardwareModel(strtoull(argv[2], &stopstring, 2));
+                NWC24GetHardwareModel(nwc24_id5);
                 break;
             case "areacode":
-                NWC24GetAreaCode(strtoull(argv[2], &stopstring, 2));
+                NWC24GetAreaCode(nwc24_id5);
                 break;
             default:
                 DisplayUsage();
