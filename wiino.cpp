@@ -182,8 +182,9 @@ u64 getUnScrambleId(u64 nwc24_id)
     u64 mix_id_copy6 = (mix_id_copy4 << 32) | mix_id_copy5;
     u64 mix_id_copy7 = mix_id_copy6 ^ 0x0000B3B3B3B3B3B3ULL;
     u16 unused = mix_id_copy7 & 0x3FF;
+    mix_id = mix_id_copy7;
 
-    printf("6. unscramble: %llu\n", mix_id_copy7);
+    printf("6. unscramble: %llu\n", mix_id);
 
     return mix_id;
 }
@@ -219,7 +220,7 @@ s32 NWC24CheckUserId(u64 nwc24_id)
 s32 main()
 {
     u64 nwc24_id;
-    NWC24MakeUserID(&nwc24_id, 2, 1, GetHardwareModel("RVL"), GetAreaCode("USA"));
+    NWC24MakeUserID(&nwc24_id, 666, 1, GetHardwareModel("RVL"), GetAreaCode("USA"));
     printf("user id generated: %llu\n", nwc24_id);
     NWC24CheckUserId(nwc24_id);
 }
