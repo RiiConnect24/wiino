@@ -2,6 +2,8 @@
 
 #include <map>
 #include <string>
+#include <stdlib.h>
+
 
 u8 GetAreaCode(const std::string& area)
 {
@@ -211,6 +213,13 @@ u64 decodeWiiID(u64 nwc24_id, u32 *hollywood_id, u16 *id_ctr, u8 *hardware_model
     return nwc24_id2;
 }
 
+int NWC24MakeUserID(u32 hollywood_id, u16 id_ctr, u8 hardware_model, u8 area_code)
+{
+    u64 *nwc24_id4;
+    NWC24MakeUserID(*nwc24_id4, hollywood_id, id_ctr, hardware_model, area_code);
+    printf("%u", (int)nwc24_id4);
+}
+
 u32 hollywood_id;
 u16 id_ctr;
 u8 hardware_model;
@@ -220,7 +229,7 @@ u16 unused;
 void NWC24CheckUserID(u64 nwc24_id)
 {
     u64 nwc24_id3 = decodeWiiID(nwc24_id, &hollywood_id, &id_ctr, &hardware_model, &area_code, &unused);
-    printf("%u", checkCRC(nwc24_id3) == 0);
+    printf("%u", (int)checkCRC(nwc24_id3));
 }
 
 void NWC24GetHollywoodID(u64 nwc24_id)
@@ -266,8 +275,58 @@ void NWC24GetAreaCode(u64 nwc24_id)
         printf("%s", entryPos->second.c_str());
 }
 
+void DisplayUsage()
+{
+    printf("%s", "usage:\n\n");
+    printf("%s", "wiino check <wii number> - checks if wii number is valid, returns 0 if yes");
+    printf("%s", "wiino <hollywood|counter|hardwaremodel|areacode> - gets specified value from wii number");
+    printf("%s", "wiino make <hollywood> <counter> <hardwaremodel> <areacode> - makes wii number from specified values");
+}
+
 s32 main(int argc, char *argv[])
 {
     // NWC24MakeUserID(&nwc24_id, 666, 1, GetHardwareModel("RVL"), GetAreaCode("USA"));
-    NWC24CheckUserID(6330930957365087);
+    if (argc == 2)
+    {
+        switch(argv[1])
+        {
+            char *stopstring;
+            case "check":
+                NWC24CheckUserID(argv[2]);
+                break;
+            case "hollywood":
+                NWC24GetHollywoodID(argv[2]);
+                break;
+            case "counter":
+                NWC24GetIDCounter(argv[2]);
+                break;
+            case "hardwaremodel":
+                NWC24GetHardwareModel(strtoull(argv[2], &stopstring, 2));
+                break;
+            case "areacode":
+                NWC24GetAreaCode(strtoull(argv[2], &stopstring, 2));
+                break;
+            default:
+                DisplayUsage();
+                break;
+        }
+    }
+
+    else if (argc == 6)
+    {
+        if (argv[1] == "make")
+        {
+            NWC24MakeUserID(argv[2], argv[3], argv[4], argv[5]);
+        }
+
+        else
+        {
+            DisplayUsage();
+        }
+    }
+
+    else
+    {
+        DisplayUsage();
+    }
 }
