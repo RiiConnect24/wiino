@@ -90,18 +90,16 @@ s32 NWC24MakeUserID(u64* nwc24_id, u32 hollywood_id, u16 id_ctr, u8 hardware_mod
 
     printf("6. make: %llu\n", mix_id);
 
-    u64 mix_id_copy1 = mix_id;
-
-    mix_id = (mix_id_copy1 | (mix_id & 0xFFFFFFFFUL)) ^ 0x0000B3B3B3B3B3B3ULL;
+    mix_id = (mix_id | (mix_id & 0xFFFFFFFFUL)) ^ 0x0000B3B3B3B3B3B3ULL;
     mix_id = (mix_id >> 10) | ((mix_id & 0x3FF) << (11 + 32));
 
     printf("5. make: %llu\n", mix_id);
 
     for (ctr = 0; ctr <= 5; ctr++)
     {
-    u8 ret = u64_get_byte(mix_id, ctr);
-    u8 foobar = ((table1[(ret >> 4) & 0xF]) << 4) | (table1[ret & 0xF]);
-    mix_id = u64_insert_byte(mix_id, ctr, foobar & 0xff);
+        u8 ret = u64_get_byte(mix_id, ctr);
+        u8 foobar = ((table1[(ret >> 4) & 0xF]) << 4) | (table1[ret & 0xF]);
+        mix_id = u64_insert_byte(mix_id, ctr, foobar & 0xff);
     }
     u64 mix_id_copy2 = mix_id;
 
@@ -109,8 +107,8 @@ s32 NWC24MakeUserID(u64* nwc24_id, u32 hollywood_id, u16 id_ctr, u8 hardware_mod
 
     for (ctr = 0; ctr <= 5; ctr++)
     {
-    u8 ret = u64_get_byte(mix_id_copy2, ctr);
-    mix_id = u64_insert_byte(mix_id, table2[ctr], ret);
+        u8 ret = u64_get_byte(mix_id_copy2, ctr);
+        mix_id = u64_insert_byte(mix_id, table2[ctr], ret);
     }
 
     printf("3. make: %llu\n", mix_id);
@@ -128,7 +126,7 @@ s32 NWC24MakeUserID(u64* nwc24_id, u32 hollywood_id, u16 id_ctr, u8 hardware_mod
     *nwc24_id = mix_id;
 
     if (mix_id > 9999999999999999ULL)
-    return 1;
+        return 1;
 
     return 0;
 }
