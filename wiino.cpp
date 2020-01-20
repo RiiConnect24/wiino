@@ -72,6 +72,7 @@ s32 NWC24MakeUserID(u64* nwc24_id, u32 hollywood_id, u16 id_ctr, u8 hardware_mod
 
     u64 mix_id = ((u64)area_code << 50) | ((u64)hardware_model << 47) | ((u64)hollywood_id << 15) |
                     ((u64)id_ctr << 10);
+    u64 mix_id_copy1 = mix_id;
 
     printf("7. make: %llu\n", mix_id);
 
