@@ -47,16 +47,6 @@ static u64 u64_insert_byte(u64 value, u8 shift, u8 byte)
   return (value & ~mask) | inst;
 }
 
-static u8 u64_get_byte2(u64 value, u8 byte)
-{
-    return (value >> (byte << 3)) & 0xFF;
-}
-
-static u64 u64_insert_byte2(u64 value, u8 newval, u8 byte)
-{
-    return (value & (0xFF << (byte << 3))) | (newval << (byte << 3));
-}
-
 const u8 table2[8] = {0x1, 0x5, 0x0, 0x4, 0x2, 0x3, 0x6, 0x7};
 const u8 table1[16] = {0x4, 0xB, 0x7, 0x9, 0xF, 0x1, 0xD, 0x3,
                        0xC, 0x2, 0x6, 0xE, 0x8, 0x0, 0xA, 0x5};
