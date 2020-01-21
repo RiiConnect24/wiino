@@ -315,7 +315,7 @@ s32 main(int argc, char *argv[])
             NWC24CheckUserID(nwc24_id5);
             printf("\nhollywood: ");
             NWC24GetHollywoodID(nwc24_id5);
-            printf("\nid: ");
+            printf("\ncounter: ");
             NWC24GetIDCounter(nwc24_id5);
             printf("\nhardwaremodel: ");
             NWC24GetHardwareModel(nwc24_id5);
