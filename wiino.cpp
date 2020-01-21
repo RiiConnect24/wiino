@@ -272,7 +272,7 @@ void DisplayUsage()
 {
     printf("%s", "usage:\n\n");
     printf("%s", "wiino check <wii number> - checks if wii number is valid, returns 0 if yes\n");
-    printf("%s", "wiino <hollywood|counter|hardwaremodel|areacode> - gets specified value from wii number\n");
+    printf("%s", "wiino <hollywood|counter|hardwaremodel|areacode|all> - gets specified value from wii number\n");
     printf("%s", "wiino make <hollywood> <counter> <hardwaremodel> <areacode> - makes wii number from specified values");
 }
 
@@ -305,6 +305,20 @@ s32 main(int argc, char *argv[])
         
         else if (strcmp(argv[1], "areacode") == 0)
         {
+            NWC24GetAreaCode(nwc24_id5);
+        }
+
+        else if (strcmp(argv[1], "all") == 0)
+        {
+            printf("crc: ");
+            NWC24CheckUserID(nwc24_id5);
+            printf("\nhollywood: ");
+            NWC24GetHollywoodID(nwc24_id5);
+            printf("\nid: ");
+            NWC24GetIDCounter(nwc24_id5);
+            printf("\nhardwaremodel: ");
+            NWC24GetHardwareModel(nwc24_id5);
+            printf("\nareacode: ");
             NWC24GetAreaCode(nwc24_id5);
         }
 
