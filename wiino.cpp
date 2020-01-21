@@ -230,7 +230,6 @@ void NWC24GetHardwareModel(u64 nwc24_id)
     static const std::map<u8, std::string> models = {
         {1, "RVL"},
         {0, "RVT"},
-        {0, "RVV"},
         {2, "RVD"},
         {7, "UNK"},
     };

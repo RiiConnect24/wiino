@@ -12,12 +12,26 @@ func u64_insert_byte(value uint64, shift uint8, byte uint8) uint64 {
     return (value & ^mask) | inst
 }
 
-var table2 [8]uint8 = [8]uint8{0x1, 0x5, 0x0, 0x4, 0x2, 0x3, 0x6, 0x7};
+var table2 [8]uint8 = [8]uint8{0x1, 0x5, 0x0, 0x4, 0x2, 0x3, 0x6, 0x7}
 var table1 [16]uint8 = [16]uint8{0x4, 0xB, 0x7, 0x9, 0xF, 0x1, 0xD, 0x3,
-                       0xC, 0x2, 0x6, 0xE, 0x8, 0x0, 0xA, 0x5};
+                       0xC, 0x2, 0x6, 0xE, 0x8, 0x0, 0xA, 0x5}
 var table1_inv [16]uint8 = [16]uint8{0xD, 0x5, 0x9, 0x7, 0x0, 0xF, // 0xE?
                        0xA, 0x2,
-                       0xC, 0x3, 0xE, 0x1, 0x8, 0x6, 0xB, 0x4};
+                       0xC, 0x3, 0xE, 0x1, 0x8, 0x6, 0xB, 0x4}
+
+func checkCRC(mix_id uint64) uint64 {
+    var ctr int = 0
+    for ctr = 0; ctr <= 42; ctr++ {
+        var value uint64 = mix_id >> (52 - ctr)
+        if (value & 1 != 0) {
+            value = 0x0000000000000635 << (42 - ctr)
+            mix_id ^= value
+        }
+        // fmt.Printf("%d ", mix_id)
+    }
+    // fmt.Printf("\n")
+    return mix_id
+}
 
 func getUnscrambleID(nwc24_id uint64) uint64 {
     var mix_id uint64 = nwc24_id
@@ -73,7 +87,15 @@ func getUnscrambleID(nwc24_id uint64) uint64 {
 func decodeWiiID(nwc24_id uint64, hollywood_id *uint32, id_ctr *uint16, hardware_model *uint8, area_code *uint8, crc *uint16) uint64 {
     var nwc24_id2 uint64 = getUnscrambleID(nwc24_id)
     *hardware_model = uint8((nwc24_id2 >> 47) & 7)
+    *area_code = uint8((nwc24_id2 >> 50) & 7)
+    *hollywood_id = uint32((nwc24_id2 >> 15) & 0xFFFFFFFF)
+    *id_ctr = uint16((nwc24_id2 >> 10) & 0x1F)
+    *crc = uint16(nwc24_id & 0x3FF)
     fmt.Printf("hardware_model: %d\n", *hardware_model)
+    fmt.Printf("area_code: %d\n", *area_code)
+    fmt.Printf("hollywood_id: %d\n", *hollywood_id)
+    fmt.Printf("id_ctr: %d\n", *id_ctr)
+    fmt.Printf("crc: %d\n", *crc)
     return nwc24_id2
 }
 
@@ -83,6 +105,35 @@ var hardware_model uint8
 var area_code uint8
 var crc uint16
 
+func NWC24CheckUserID(nwc24_id uint64) {
+    var nwc24_id3 uint64 = decodeWiiID(nwc24_id, &hollywood_id, &id_ctr, &hardware_model, &area_code, &crc)
+    fmt.Printf("%d", uint8(checkCRC(nwc24_id3)))
+}
+
+func NWC24GetHollywoodID(nwc24_id uint64) {
+    decodeWiiID(nwc24_id, &hollywood_id, &id_ctr, &hardware_model, &area_code, &crc)
+    fmt.Printf("%d", hollywood_id)
+}
+
+func NWC24GetIDCounter(nwc24_id uint64) {
+    decodeWiiID(nwc24_id, &hollywood_id, &id_ctr, &hardware_model, &area_code, &crc)
+    fmt.Printf("%d", id_ctr)
+}
+
+func NWC24GetHardwareModel(nwc24_id uint64) {
+    var models map[int]string = map[int]string{
+        1: "RVL",
+        0: "RVT",
+        0: "RVV",
+        2: "RVD",
+        7: "UNK",
+    }
+
+    decodeWiiID(nwc24_id, &hollywood_id, &id_ctr, &hardware_model, &area_code, &crc)
+
+    fmt.Printf("%s", models[hardware_model])
+}
+
 func main() {
-    getUnscrambleID(6330930957365086)
+    NWC24GetHardwareModel(6330930957365086)
 }
