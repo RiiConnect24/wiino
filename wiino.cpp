@@ -228,12 +228,12 @@ void NWC24GetIDCounter(u64 nwc24_id)
 void NWC24GetHardwareModel(u64 nwc24_id)
 {
     static const std::map<u8, std::string> models = {
-        {1, "RVL"},
         {0, "RVT"},
+        {1, "RVL"},
         {2, "RVD"},
         {7, "UNK"},
     };
-    
+
     u64 nwc24_id3 = decodeWiiID(nwc24_id, &hollywood_id, &id_ctr, &hardware_model, &area_code, &crc);
 
     auto entryPos = models.find(hardware_model);

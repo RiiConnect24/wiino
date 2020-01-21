@@ -33,6 +33,44 @@ func checkCRC(mix_id uint64) uint64 {
     return mix_id
 }
 
+func NWC24iGetUserID(hollywood_id uint32, id_ctr uint16, hardware_model uint8, area_code uint8) uint64 {
+    // fmt.Printf("hardware_model: %d\n", hardware_model)
+    // fmt.Printf("area_code: %d\n", area_code)
+    // fmt.Printf("hollywood_id: %d\n", hollywood_id)
+    // fmt.Printf("id_ctr: %d\n", id_ctr)
+
+    var mix_id uint64 = (uint64(area_code << 50) | uint64(hardware_model << 47) | uint64(hollywood_id << 15) | uint64(id_ctr << 10))
+    var mix_id_copy1 uint64 = mix_id
+
+    // fmt.Printf("7. make: %d\n", mix_id)
+
+    mix_id = checkCRC(mix_id)
+
+    // fmt.Printf("6. make: %d\n", mix_id)
+
+    mix_id = (mix_id_copy1 | (mix_id & 0xFFFFFFFF)) ^ 0x0000B3B3B3B3B3B3
+    mix_id = (mix_id >> 10) | ((mix_id & 0x3FF) << (11 + 32))
+
+    // fmt.Printf("5. make: %d\n", mix_id)
+
+    var ctr int = 0
+    for ctr = 0; ctr <= 5; ctr++ {
+        var ret uint8 = u64_get_byte(mix_id, uint8(ctr))
+        var foobar uint8 = ((table1[(ret >> 4) & 0xF]) << 4) | (table1[ret & 0xF])
+        mix_id = u64_insert_byte(mix_id, uint8(ctr), foobar & 0xff)
+    }
+    var mix_id_copy2 uint64 = mix_id
+
+    // fmt.Printf("4. make: %d\n", mix_id)
+
+    for ctr = 0; ctr <= 5; ctr++ {
+        var ret uint8 = u64_get_byte(mix_id_copy2, uint8(ctr))
+        mix_id = u64_insert_byte(mix_id, table2[uint8(ctr)], ret)
+    }
+
+    // fmt.Printf("3. make: %d\n", mix_id)
+}
+
 func getUnscrambleID(nwc24_id uint64) uint64 {
     var mix_id uint64 = nwc24_id
 
@@ -121,10 +159,9 @@ func NWC24GetIDCounter(nwc24_id uint64) {
 }
 
 func NWC24GetHardwareModel(nwc24_id uint64) {
-    var models map[int]string = map[int]string{
-        1: "RVL",
+    var models map[uint8]string = map[uint8]string{
         0: "RVT",
-        0: "RVV",
+        1: "RVL",
         2: "RVD",
         7: "UNK",
     }
@@ -134,6 +171,23 @@ func NWC24GetHardwareModel(nwc24_id uint64) {
     fmt.Printf("%s", models[hardware_model])
 }
 
+func NWC24GetAreaCode(nwc24_id uint64) {
+    var regions map[uint8]string = map[uint8]string{
+        0: "JPN",
+        1: "USA",
+        2: "EUR",
+        3: "TWN",
+        4: "KOR",
+        5: "HKG",
+        6: "CHN",
+        7: "UNK",
+    }
+
+    decodeWiiID(nwc24_id, &hollywood_id, &id_ctr, &hardware_model, &area_code, &crc)
+
+    fmt.Printf("%s", regions[area_code])
+}
+
 func main() {
-    NWC24GetHardwareModel(6330930957365086)
+    NWC24GetAreaCode(6330930957365086)
 }
