@@ -244,6 +244,7 @@ void NWC24GetHardwareModel(u64 nwc24_id)
         {0, "RVT"},
         {0, "RVV"},
         {2, "RVD"},
+        {7, "UNK"},
     };
     
     u64 nwc24_id3 = decodeWiiID(nwc24_id, &hollywood_id, &id_ctr, &hardware_model, &area_code, &unused);
