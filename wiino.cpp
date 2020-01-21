@@ -138,8 +138,6 @@ u64 NWC24iMakeUserID(u32 hollywood_id, u16 id_ctr, u8 hardware_model, u8 area_co
 u64 getUnScrambleId(u64 nwc24_id)
 {
     u64 mix_id = nwc24_id;
-    u8 a;
-    u8 b;
 
     // printf("1. unscramble: %llu\n", mix_id);
 
