@@ -125,7 +125,7 @@ u64 NWC24iMakeUserID(u32 hollywood_id, u16 id_ctr, u8 hardware_model, u8 area_co
     return mix_id;
 }
 
-u64 getUnScrambleId(u64 nwc24_id)
+u64 getUnScrambleID(u64 nwc24_id)
 {
     u64 mix_id = nwc24_id;
 
@@ -181,7 +181,7 @@ u64 getUnScrambleId(u64 nwc24_id)
 
 u64 decodeWiiID(u64 nwc24_id, u32 *hollywood_id, u16 *id_ctr, u8 *hardware_model, u8 *area_code, u16 *crc)
 {
-    u64 nwc24_id2 = getUnScrambleId(nwc24_id);
+    u64 nwc24_id2 = getUnScrambleID(nwc24_id);
     *hardware_model = (nwc24_id2 >> 47) & 7;
     *area_code = (nwc24_id2 >> 50) & 7;
     *hollywood_id = (nwc24_id2 >> 15) & 0xFFFFFFFF;

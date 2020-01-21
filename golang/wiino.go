@@ -70,6 +70,19 @@ func getUnscrambleID(nwc24_id uint64) uint64 {
     return mix_id
 }
 
+func decodeWiiID(nwc24_id uint64, hollywood_id *uint32, id_ctr *uint16, hardware_model *uint8, area_code *uint8, crc *uint16) uint64 {
+    var nwc24_id2 uint64 = getUnscrambleID(nwc24_id)
+    *hardware_model = uint8((nwc24_id2 >> 47) & 7)
+    fmt.Printf("hardware_model: %d\n", *hardware_model)
+    return nwc24_id2
+}
+
+var hollywood_id uint32
+var id_ctr uint16
+var hardware_model uint8
+var area_code uint8
+var crc uint16
+
 func main() {
     getUnscrambleID(6330930957365086)
 }
