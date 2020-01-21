@@ -33,13 +33,13 @@ func checkCRC(mix_id uint64) uint64 {
     return mix_id
 }
 
-func NWC24iGetUserID(hollywood_id uint32, id_ctr uint16, hardware_model uint8, area_code uint8) uint64 {
+func NWC24iMakeUserID(hollywood_id uint32, id_ctr uint16, hardware_model uint8, area_code uint8) uint64 {
     // fmt.Printf("hardware_model: %d\n", hardware_model)
     // fmt.Printf("area_code: %d\n", area_code)
     // fmt.Printf("hollywood_id: %d\n", hollywood_id)
     // fmt.Printf("id_ctr: %d\n", id_ctr)
 
-    var mix_id uint64 = (uint64(area_code << 50) | uint64(hardware_model << 47) | uint64(hollywood_id << 15) | uint64(id_ctr << 10))
+    var mix_id uint64 = (uint64(area_code) << 50 | uint64(hardware_model) << 47 | uint64(hollywood_id) << 15 | uint64(id_ctr) << 10)
     var mix_id_copy1 uint64 = mix_id
 
     // fmt.Printf("7. make: %d\n", mix_id)
@@ -69,18 +69,30 @@ func NWC24iGetUserID(hollywood_id uint32, id_ctr uint16, hardware_model uint8, a
     }
 
     // fmt.Printf("3. make: %d\n", mix_id)
+
+    mix_id &= 0x001FFFFFFFFFFFFF
+    mix_id = (mix_id << 1) | ((mix_id >> 52) & 1)
+
+    // fmt.Printf("2. make: %d\n", mix_id)
+
+    mix_id ^= 0x00005E5E5E5E5E5E
+    mix_id &= 0x001FFFFFFFFFFFFF
+
+    // fmt.Printf("1. make: %d\n", mix_id)
+
+    return mix_id
 }
 
 func getUnscrambleID(nwc24_id uint64) uint64 {
     var mix_id uint64 = nwc24_id
 
-    fmt.Printf("1. unscramble: %d\n", mix_id)
+    // fmt.Printf("1. unscramble: %d\n", mix_id)
 
     mix_id &= 0x001FFFFFFFFFFFFF
     mix_id ^= 0x00005E5E5E5E5E5E
     mix_id &= 0x001FFFFFFFFFFFFF
 
-    fmt.Printf("2. unscramble: %d\n", mix_id)
+    // fmt.Printf("2. unscramble: %d\n", mix_id)
 
     var mix_id_copy2 uint64 = mix_id
 
@@ -90,7 +102,7 @@ func getUnscrambleID(nwc24_id uint64) uint64 {
     mix_id |= mix_id_copy2 << 48
     mix_id >>= 1
 
-    fmt.Printf("3. unscramble: %d\n", mix_id)
+    // fmt.Printf("3. unscramble: %d\n", mix_id)
 
     mix_id_copy2 = mix_id
 
@@ -100,7 +112,7 @@ func getUnscrambleID(nwc24_id uint64) uint64 {
         mix_id = u64_insert_byte(mix_id, uint8(ctr), ret)
     }
 
-    fmt.Printf("4. unscramble: %d\n", mix_id)
+    // fmt.Printf("4. unscramble: %d\n", mix_id)
 
     for ctr = 0; ctr <= 5; ctr++ {
         var ret uint8 = u64_get_byte(mix_id, uint8(ctr))
@@ -108,7 +120,7 @@ func getUnscrambleID(nwc24_id uint64) uint64 {
         mix_id = u64_insert_byte(mix_id, uint8(ctr), foobar & 0xff)
     }
 
-    fmt.Printf("5. unscramble: %d\n", mix_id)
+    // fmt.Printf("5. unscramble: %d\n", mix_id)
 
     var mix_id_copy3 uint64 = mix_id >> 0x20
     var mix_id_copy4 uint64 = mix_id >> 0x16 | (mix_id_copy3 & 0x7FF) << 10
@@ -117,7 +129,7 @@ func getUnscrambleID(nwc24_id uint64) uint64 {
     var mix_id_copy7 uint64 = mix_id_copy6 ^ 0x0000B3B3B3B3B3B3
     mix_id = mix_id_copy7
 
-    fmt.Printf("6. unscramble: %d\n", mix_id)
+    // fmt.Printf("6. unscramble: %d\n", mix_id)
 
     return mix_id
 }
@@ -129,12 +141,18 @@ func decodeWiiID(nwc24_id uint64, hollywood_id *uint32, id_ctr *uint16, hardware
     *hollywood_id = uint32((nwc24_id2 >> 15) & 0xFFFFFFFF)
     *id_ctr = uint16((nwc24_id2 >> 10) & 0x1F)
     *crc = uint16(nwc24_id & 0x3FF)
-    fmt.Printf("hardware_model: %d\n", *hardware_model)
-    fmt.Printf("area_code: %d\n", *area_code)
-    fmt.Printf("hollywood_id: %d\n", *hollywood_id)
-    fmt.Printf("id_ctr: %d\n", *id_ctr)
-    fmt.Printf("crc: %d\n", *crc)
+    // fmt.Printf("hardware_model: %d\n", *hardware_model)
+    // fmt.Printf("area_code: %d\n", *area_code)
+    // fmt.Printf("hollywood_id: %d\n", *hollywood_id)
+    // fmt.Printf("id_ctr: %d\n", *id_ctr)
+    // fmt.Printf("crc: %d\n", *crc)
     return nwc24_id2
+}
+
+func NWC24MakeUserID(hollywood_id uint32, id_ctr uint16, hardware_model uint8, area_code uint8) uint64 {
+    var nwc24_id4 uint64 = NWC24iMakeUserID(hollywood_id, id_ctr, hardware_model, area_code)
+    // fmt.Printf("%d", nwc24_id4)
+    return nwc24_id4
 }
 
 var hollywood_id uint32
@@ -143,22 +161,28 @@ var hardware_model uint8
 var area_code uint8
 var crc uint16
 
-func NWC24CheckUserID(nwc24_id uint64) {
+func NWC24CheckUserID(nwc24_id uint64) uint8 {
     var nwc24_id3 uint64 = decodeWiiID(nwc24_id, &hollywood_id, &id_ctr, &hardware_model, &area_code, &crc)
-    fmt.Printf("%d", uint8(checkCRC(nwc24_id3)))
+    // fmt.Printf("%d", uint8(checkCRC(nwc24_id3)))
+
+    return uint8(checkCRC(nwc24_id3))
 }
 
-func NWC24GetHollywoodID(nwc24_id uint64) {
+func NWC24GetHollywoodID(nwc24_id uint64) uint32 {
     decodeWiiID(nwc24_id, &hollywood_id, &id_ctr, &hardware_model, &area_code, &crc)
-    fmt.Printf("%d", hollywood_id)
+    // fmt.Printf("%d", hollywood_id)
+
+    return hollywood_id
 }
 
-func NWC24GetIDCounter(nwc24_id uint64) {
+func NWC24GetIDCounter(nwc24_id uint64) uint16 {
     decodeWiiID(nwc24_id, &hollywood_id, &id_ctr, &hardware_model, &area_code, &crc)
-    fmt.Printf("%d", id_ctr)
+    // fmt.Printf("%d", id_ctr)
+
+    return id_ctr
 }
 
-func NWC24GetHardwareModel(nwc24_id uint64) {
+func NWC24GetHardwareModel(nwc24_id uint64) string {
     var models map[uint8]string = map[uint8]string{
         0: "RVT",
         1: "RVL",
@@ -167,11 +191,12 @@ func NWC24GetHardwareModel(nwc24_id uint64) {
     }
 
     decodeWiiID(nwc24_id, &hollywood_id, &id_ctr, &hardware_model, &area_code, &crc)
+    // fmt.Printf("%s", models[hardware_model])
 
-    fmt.Printf("%s", models[hardware_model])
+    return models[hardware_model]
 }
 
-func NWC24GetAreaCode(nwc24_id uint64) {
+func NWC24GetAreaCode(nwc24_id uint64) string {
     var regions map[uint8]string = map[uint8]string{
         0: "JPN",
         1: "USA",
@@ -184,10 +209,11 @@ func NWC24GetAreaCode(nwc24_id uint64) {
     }
 
     decodeWiiID(nwc24_id, &hollywood_id, &id_ctr, &hardware_model, &area_code, &crc)
+    // fmt.Printf("%s", regions[area_code])
 
-    fmt.Printf("%s", regions[area_code])
+    return regions[area_code]
 }
 
 func main() {
-    NWC24GetAreaCode(6330930957365086)
+    NWC24CheckUserID(6330930957365086)
 }

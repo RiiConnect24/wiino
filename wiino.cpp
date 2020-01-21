@@ -4,37 +4,6 @@
 #include <string>
 #include <stdlib.h>
 
-
-u8 GetAreaCode(const std::string& area)
-{
-  static const std::map<std::string, u8> regions = {
-      {"JPN", 0}, {"USA", 1}, {"EUR", 2}, {"AUS", 2}, {"BRA", 1}, {"TWN", 3}, {"ROC", 3},
-      {"KOR", 4}, {"HKG", 5}, {"ASI", 5}, {"LTN", 1}, {"SAF", 2}, {"CHN", 6},
-  };
-
-  auto entryPos = regions.find(area);
-  if (entryPos != regions.end())
-    return entryPos->second;
-
-  return 7;  // Unknown
-}
-
-u8 GetHardwareModel(const std::string& model)
-{
-  static const std::map<std::string, u8> models = {
-      {"RVL", 1},
-      {"RVT", 0},
-      {"RVV", 0},
-      {"RVD", 2},
-  };
-
-  auto entryPos = models.find(model);
-  if (entryPos != models.end())
-    return entryPos->second;
-
-  return 7;
-}
-
 static u8 u64_get_byte(u64 value, u8 shift)
 {
   return (u8)(value >> (shift * 8));
