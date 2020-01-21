@@ -179,19 +179,19 @@ u64 getUnScrambleId(u64 nwc24_id)
     return mix_id;
 }
 
-u64 decodeWiiID(u64 nwc24_id, u32 *hollywood_id, u16 *id_ctr, u8 *hardware_model, u8 *area_code, u16 *unused)
+u64 decodeWiiID(u64 nwc24_id, u32 *hollywood_id, u16 *id_ctr, u8 *hardware_model, u8 *area_code, u16 *crc)
 {
     u64 nwc24_id2 = getUnScrambleId(nwc24_id);
     *hardware_model = (nwc24_id2 >> 47) & 7;
     *area_code = (nwc24_id2 >> 50) & 7;
     *hollywood_id = (nwc24_id2 >> 15) & 0xFFFFFFFF;
     *id_ctr = (nwc24_id2 >> 10) & 0x1F;
-    *unused = nwc24_id2 & 0x3FF;
+    *crc = nwc24_id2 & 0x3FF;
     // printf("hardware_model: %u\n", *hardware_model);
     // printf("area_code: %u\n", *area_code);
     // printf("hollywood_id: %u\n", *hollywood_id);
     // printf("id_ctr: %u\n", *id_ctr);
-    // printf("unused: %u\n", *unused);
+    // printf("crc: %u\n", *crc);
     return nwc24_id2;
 }
 
@@ -205,23 +205,23 @@ u32 hollywood_id;
 u16 id_ctr;
 u8 hardware_model;
 u8 area_code;
-u16 unused;
+u16 crc;
 
 void NWC24CheckUserID(u64 nwc24_id)
 {
-    u64 nwc24_id3 = decodeWiiID(nwc24_id, &hollywood_id, &id_ctr, &hardware_model, &area_code, &unused);
+    u64 nwc24_id3 = decodeWiiID(nwc24_id, &hollywood_id, &id_ctr, &hardware_model, &area_code, &crc);
     printf("%d", (u8)checkCRC(nwc24_id3));
 }
 
 void NWC24GetHollywoodID(u64 nwc24_id)
 {
-    u64 nwc24_id3 = decodeWiiID(nwc24_id, &hollywood_id, &id_ctr, &hardware_model, &area_code, &unused);
+    u64 nwc24_id3 = decodeWiiID(nwc24_id, &hollywood_id, &id_ctr, &hardware_model, &area_code, &crc);
     printf("%u", hollywood_id);
 }
 
 void NWC24GetIDCounter(u64 nwc24_id)
 {
-    u64 nwc24_id3 = decodeWiiID(nwc24_id, &hollywood_id, &id_ctr, &hardware_model, &area_code, &unused);
+    u64 nwc24_id3 = decodeWiiID(nwc24_id, &hollywood_id, &id_ctr, &hardware_model, &area_code, &crc);
     printf("%u", id_ctr);
 }
 
@@ -235,7 +235,7 @@ void NWC24GetHardwareModel(u64 nwc24_id)
         {7, "UNK"},
     };
     
-    u64 nwc24_id3 = decodeWiiID(nwc24_id, &hollywood_id, &id_ctr, &hardware_model, &area_code, &unused);
+    u64 nwc24_id3 = decodeWiiID(nwc24_id, &hollywood_id, &id_ctr, &hardware_model, &area_code, &crc);
 
     auto entryPos = models.find(hardware_model);
     if (entryPos != models.end())
@@ -250,7 +250,7 @@ void NWC24GetAreaCode(u64 nwc24_id)
         {6, "CHN"}, {7, "UNK"},
     };
     
-    u64 nwc24_id3 = decodeWiiID(nwc24_id, &hollywood_id, &id_ctr, &hardware_model, &area_code, &unused);
+    u64 nwc24_id3 = decodeWiiID(nwc24_id, &hollywood_id, &id_ctr, &hardware_model, &area_code, &crc);
 
     auto entryPos = regions.find(area_code);
     if (entryPos != regions.end())
