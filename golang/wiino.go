@@ -20,9 +20,9 @@ var table1_inv [16]uint8 = [16]uint8{0xD, 0x5, 0x9, 0x7, 0x0, 0xF, // 0xE?
 func checkCRC(mix_id uint64) uint64 {
     var ctr int = 0
     for ctr = 0; ctr <= 42; ctr++ {
-        var value uint64 = mix_id >> (52 - ctr)
+        var value uint64 = mix_id >> uint64(52 - ctr)
         if (value & 1 != 0) {
-            value = 0x0000000000000635 << (42 - ctr)
+            value = 0x0000000000000635 << uint64(42 - ctr)
             mix_id ^= value
         }
         // fmt.Printf("%d ", mix_id)
