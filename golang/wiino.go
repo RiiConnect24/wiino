@@ -211,7 +211,3 @@ func NWC24GetAreaCode(nwc24_id uint64) string {
 
     return regions[area_code]
 }
-
-func main() {
-    NWC24CheckUserID(6330930957365086)
-}
