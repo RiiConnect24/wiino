@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 func u64_get_byte(value uint64, shift uint8) uint8 {
     return (uint8)(value >> (shift * 8))
 }
