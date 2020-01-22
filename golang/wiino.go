@@ -191,7 +191,7 @@ func NWC24GetHardwareModel(nwc24_id uint64) string {
     }
 
     decodeWiiID(nwc24_id, &hollywood_id, &id_ctr, &hardware_model, &area_code, &crc)
-    // fmt.Printf("%s", models[hardware_model])
+    // fmt.Printf("%d (%s)", hardware_model, models[hardware_model])
 
     return models[hardware_model]
 }
@@ -209,7 +209,7 @@ func NWC24GetAreaCode(nwc24_id uint64) string {
     }
 
     decodeWiiID(nwc24_id, &hollywood_id, &id_ctr, &hardware_model, &area_code, &crc)
-    // fmt.Printf("%s", regions[area_code])
+    // fmt.Printf("%d (%s)", hardware_model, regions[area_code])
 
     return regions[area_code]
 }

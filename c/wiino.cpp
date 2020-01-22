@@ -207,7 +207,7 @@ void NWC24GetHardwareModel(u64 nwc24_id)
 
     auto entryPos = models.find(hardware_model);
     if (entryPos != models.end())
-        printf("%s", entryPos->second.c_str());
+        printf("%u (%s)", hardware_model, entryPos->second.c_str());
 }
 
 void NWC24GetAreaCode(u64 nwc24_id)
@@ -222,7 +222,7 @@ void NWC24GetAreaCode(u64 nwc24_id)
 
     auto entryPos = regions.find(area_code);
     if (entryPos != regions.end())
-        printf("%s", entryPos->second.c_str());
+        printf("%u (%s)", hardware_model, entryPos->second.c_str());
 }
 
 void DisplayUsage()
