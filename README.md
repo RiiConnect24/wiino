@@ -7,7 +7,7 @@ The variables are:
 - Hollywood ID (GPU chip in the Wii)
 - Counter (increments every time you format your Wii)
 - Hardware Model (RVT, RVL...)
-- Area Code (Region)
+- Area Code (Region - USA, EUR, JPN...)
 
 The code currently works for these languages:
 
