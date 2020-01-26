@@ -3,6 +3,7 @@
 #include <map>
 #include <string>
 #include <stdlib.h>
+#include <cstring>
 
 static u8 u64_get_byte(u64 value, u8 shift)
 {
