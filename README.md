@@ -13,3 +13,4 @@ The code currently works for these languages:
 
 - C
 - Golang
+- Python
