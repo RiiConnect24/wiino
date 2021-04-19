@@ -5,8 +5,8 @@ This code lets you extract variables from a Wii Number, verify if it's valid, or
 The variables are:
 
 - Hollywood ID (GPU chip in the Wii)
-- Counter (increments every time you format your Wii)
-- Hardware Model (RVT, RVL...)
+- Counter (increments every time you format your Wii, can range from 0-31)
+- Hardware Model (RVL, RVT for dev hardware...)
 - Area Code (Region - USA, EUR, JPN...)
 - Checksum
 
