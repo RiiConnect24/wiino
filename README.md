@@ -8,6 +8,7 @@ The variables are:
 - Counter (increments every time you format your Wii)
 - Hardware Model (RVT, RVL...)
 - Area Code (Region - USA, EUR, JPN...)
+- Checksum
 
 The code currently works for these languages:
 
