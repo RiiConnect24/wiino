@@ -51,9 +51,6 @@ def getUnScrambleID(mix_id):
     mix_id ^= 0x00005E5E5E5E5E5E
     mix_id &= 0x001FFFFFFFFFFFFF
     
-    mix_id_copy2 = mix_id
-
-    mix_id_copy2 ^= 0xFF
     mix_id_copy2 = (mix_id << 5) & 0x20
 
     mix_id |= mix_id_copy2 << 48
