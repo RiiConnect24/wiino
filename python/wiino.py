@@ -1,6 +1,5 @@
 def u64_get_byte(value, shift):
-    byte = (value >> (shift * 8)) & 0xff
-    return byte
+    return (value >> (shift * 8)) & 0xff
 
 def u64_insert_byte(value, shift, byte):
     mask = 0x00000000000000FF << (shift * 8)
@@ -93,17 +92,13 @@ def NWC24CheckUserID(nwc24_id):
     return checkCRC(unscrambled) & 0xFFFFFFFF
 
 def NWC24GetHollywoodID(nwc24_id):
-    hollywood = decodeWiiID(nwc24_id)[3]
-    return hollywood
+    return decodeWiiID(nwc24_id)[3]
 
 def NWC24GetIDCounter(nwc24_id):
-    id_ctr = decodeWiiID(nwc24_id)[4]
-    return id_ctr
+    return decodeWiiID(nwc24_id)[4]
     
 def NWC24GetHardwareModel(nwc24_id):
-    hardware_model = decodeWiiID(nwc24_id)[1]
-    return hardware_model
+    return decodeWiiID(nwc24_id)[1]
     
 def NWC24GetAreaCode(nwc24_id):
-    area_code = decodeWiiID(nwc24_id)[2]
-    return area_code
+    return decodeWiiID(nwc24_id)[2]
